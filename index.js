@@ -46,10 +46,10 @@ app.post('/webhook/', function (req, res) {
 
       if (event.message && event.message.text) {
   	    let text = event.message.text
-  	    if (text === 'Generic') {
-  		    sendGenericMessage(sender)
-  		    continue
-  	    }
+  	    // if (text === 'Generic') {
+  		    // sendGenericMessage(sender)
+  		    // continue
+  	    // }
   	    sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
       }
       //
@@ -82,6 +82,8 @@ function sendTextMessage(sender, text) {
     //   {"content_type":"location",}
     // ]
   }
+  console.log("#############" + sender)
+
     request({
 	    url: 'https://graph.facebook.com/v2.6/me/messages',
 	    qs: {access_token:token},
