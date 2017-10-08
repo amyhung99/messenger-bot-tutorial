@@ -52,20 +52,20 @@ app.post('/webhook/', function (req, res) {
   	    // }
   	    sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
       }
-      //
+
       // if (event.postback) {
   	  //   let text = JSON.stringify(event.postback)
   	  //   sendTextMessage(sender, "Postback received: "+text.substring(0, 200), token)
   	  //   continue
       // }
       //
-      // else if( event.message.attachments[0].type=="location"){
-      //   var lat = event.message.attachments[0].payload.coordinates.lat
-      //   var lng = event.message.attachments[0].payload.coordinates.long
-      //   console.log(lat,lng)
-      //   sendLocationMessage(sender,event)
-      //   continue
-      // }
+      if( event.message.attachments[0].type=="location"){
+        var lat = event.message.attachments[0].payload.coordinates.lat
+        var lng = event.message.attachments[0].payload.coordinates.long
+        console.log(lat,lng)
+        sendLocationMessage(sender,event)
+        continue
+      }
       // else  if(text=="where am i"){
       //   sendLocationPlaceMessage(sender)
       //   continue
@@ -78,9 +78,9 @@ const token = process.env.FB_PAGE_ACCESS_TOKEN
 
 function sendTextMessage(sender, text) {
   let messageData = { text:text,
-    // "quick_replies":[
-    //   {"content_type":"location",}
-    // ]
+    "quick_replies":[
+      {"content_type":"location",}
+    ]
   }
   console.log("#############" + sender)
 
