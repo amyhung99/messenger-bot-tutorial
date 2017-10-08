@@ -59,21 +59,29 @@ app.post('/webhook/', function (req, res) {
   	    continue
       }
 
-      if( event.message.attachments[0].type=="location"){
+      else if( event.message.attachments[0].type=="location"){
         var lat = event.message.attachments[0].payload.coordinates.lat
         var lng = event.message.attachments[0].payload.coordinates.long
         console.log(lat,lng)
         sendLocationMessage(sender,event)
         continue
-    }
-    
+      }
+      else  if(text=="where am i"){
+        sendLocationPlaceMessage(sender)
+        continue
+      }
+
     }
     res.sendStatus(200)
   })
 const token = process.env.FB_PAGE_ACCESS_TOKEN
 
 function sendTextMessage(sender, text) {
-    let messageData = { text:text }
+  let messageData = { text:text,
+    "quick_replies":[
+      {"content_type":"location",}
+    ]
+  }
     request({
 	    url: 'https://graph.facebook.com/v2.6/me/messages',
 	    qs: {access_token:token},
@@ -137,5 +145,62 @@ function sendGenericMessage(sender) {
 	    } else if (response.body.error) {
 		    console.log('Error: ', response.body.error)
 	    }
+    })
+}
+
+function sendLocationMessage(sender,event){
+  let messageData = {
+    "attachment": {
+      "type": "template",
+      "payload": {
+        "template_type": "generic",
+        "elements": [{
+          "title": 'Location Shared By Bot',
+          "subtitle": "Location Subtitle",
+          "image_url": "https://maps.googleapis.com/maps/api/staticmap?key=" + "  AIzaSyBFwMNFL402Cy0KUwaSdxw1oXtCAo03MSs" +
+          "&markers=color:red|label:B|" + event.message.attachments[0].payload.coordinates.lat + "," + event.message.attachments[0].payload.coordinates.long + "&size=360x360&zoom=13"
+        }]
+      }
+    }
+
+  }
+
+     request({
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: {access_token:token},
+        method: 'POST',
+        json: {
+            recipient: {id:sender},
+            message: messageData,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log('Error sending messages: ', error)
+        } else if (response.body.error) {
+            console.log('Error: ', response.body.error)
+        }
+    })
+}
+
+function sendLocationPlaceMessage(sender){
+    let messageData = { text:"where are you?",
+                      "quick_replies":[
+                      {"content_type":"location",}
+                    ]
+                  }
+    request({
+        url: 'https://graph.facebook.com/v2.6/me/messages',
+        qs: {access_token:token},
+        method: 'POST',
+        json: {
+            recipient: {id:sender},
+            message: messageData,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log('Error sending messages: ', error)
+        } else if (response.body.error) {
+            console.log('Error: ', response.body.error)
+        }
     })
 }
