@@ -59,12 +59,12 @@ app.post('/webhook/', function (req, res) {
   	  //   continue
       // }
       //
-      if( event.message.attachments[0].type=="location"){
+      if(event.message.attachments[0].type=="location"){
         var lat = event.message.attachments[0].payload.coordinates.lat
         var lng = event.message.attachments[0].payload.coordinates.long
         console.log(lat,lng)
         sendLocationMessage(sender,event)
-        continue
+        // continue
       }
       // else  if(text=="where am i"){
       //   sendLocationPlaceMessage(sender)
