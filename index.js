@@ -2,11 +2,7 @@
 /*
 Please report any bugs to nicomwaks@gmail.com
 
-i have added console.log on line 48 
-
-
-
-
+i have added console.log on line 48
  */
 'use strict'
 
@@ -45,16 +41,35 @@ app.listen(app.get('port'), function() {
 app.post('/webhook/', function (req, res) {
     let messaging_events = req.body.entry[0].messaging
     for (let i = 0; i < messaging_events.length; i++) {
-	    let event = req.body.entry[0].messaging[i]
-	    let sender = event.sender.id
-	    if (event.message && event.message.text) {
-		    let text = event.message.text
-		    sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
-	    }
+      let event = req.body.entry[0].messaging[i]
+      let sender = event.sender.id
+
+      if (event.message && event.message.text) {
+  	    let text = event.message.text
+  	    if (text === 'Generic') {
+  		    sendGenericMessage(sender)
+  		    continue
+  	    }
+  	    sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
+      }
+
+      if (event.postback) {
+  	    let text = JSON.stringify(event.postback)
+  	    sendTextMessage(sender, "Postback received: "+text.substring(0, 200), token)
+  	    continue
+      }
+
+      if( event.message.attachments[0].type=="location"){
+        var lat = event.message.attachments[0].payload.coordinates.lat
+        var lng = event.message.attachments[0].payload.coordinates.long
+        console.log(lat,lng)
+        sendLocationMessage(sender,event)
+        continue
+    }
+    
     }
     res.sendStatus(200)
-})
-
+  })
 const token = process.env.FB_PAGE_ACCESS_TOKEN
 
 function sendTextMessage(sender, text) {
@@ -124,25 +139,3 @@ function sendGenericMessage(sender) {
 	    }
     })
 }
-
-app.post('/webhook/', function (req, res) {
-    let messaging_events = req.body.entry[0].messaging
-    for (let i = 0; i < messaging_events.length; i++) {
-      let event = req.body.entry[0].messaging[i]
-      let sender = event.sender.id
-      if (event.message && event.message.text) {
-  	    let text = event.message.text
-  	    if (text === 'Generic') {
-  		    sendGenericMessage(sender)
-  		    continue
-  	    }
-  	    sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
-      }
-      if (event.postback) {
-  	    let text = JSON.stringify(event.postback)
-  	    sendTextMessage(sender, "Postback received: "+text.substring(0, 200), token)
-  	    continue
-      }
-    }
-    res.sendStatus(200)
-  })
